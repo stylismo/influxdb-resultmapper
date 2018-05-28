@@ -17,11 +17,11 @@ import kotlin.reflect.full.isSupertypeOf
 
 internal class ConverterRegistry {
 
-    private val timeConverters = mutableSetOf<TimeConverter<*>>()
+    private val timeConverters = mutableSetOf<TimeConverter<out Any?>>()
 
-    private val tagConverters = mutableSetOf<TagConverter<*>>()
+    private val tagConverters = mutableSetOf<TagConverter<out Any?>>()
 
-    private val fieldConverters = mutableSetOf<FieldConverter<*, *>>()
+    private val fieldConverters = mutableSetOf<FieldConverter<out Any?, out Any?>>()
 
     init {
         timeConverters.add(InstantConverter())
@@ -43,42 +43,42 @@ internal class ConverterRegistry {
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <T> findTimeConverterFor(type: KType): TimeConverter<T> =
+    fun <T : Any?> findTimeConverterFor(type: KType): TimeConverter<T> =
             timeConverters.find {
                 it.supportedType().isSupertypeOf(type)
             } as TimeConverter<T>?
                     ?: throw MappingException("No time converter found for type $type.")
 
     @Suppress("UNCHECKED_CAST")
-    fun <T> findTimeConverter(converter: KClass<out TimeConverter<*>>): TimeConverter<T> =
+    fun <T : Any?> findTimeConverter(converter: KClass<out TimeConverter<*>>): TimeConverter<T> =
             timeConverters.find {
                 it::class == converter
             } as TimeConverter<T>?
                     ?: throw MappingException("No time converter with class $converter found.")
 
     @Suppress("UNCHECKED_CAST")
-    fun <T> findTagConverterFor(type: KType): TagConverter<T> =
+    fun <T : Any?> findTagConverterFor(type: KType): TagConverter<T> =
             tagConverters.find {
                 it.supportedType().isSupertypeOf(type)
             } as TagConverter<T>?
                     ?: throw MappingException("No tag converter found for type $type.")
 
     @Suppress("UNCHECKED_CAST")
-    fun <T> findTagConverter(converter: KClass<out TagConverter<*>>): TagConverter<T> =
+    fun <T : Any?> findTagConverter(converter: KClass<out TagConverter<*>>): TagConverter<T> =
             tagConverters.find {
                 it::class == converter
             } as TagConverter<T>?
                     ?: throw MappingException("No tag converter with class $converter found.")
 
     @Suppress("UNCHECKED_CAST")
-    fun <T, R> findFieldConverterFor(type: KType): FieldConverter<T, R> =
+    fun <T : Any?, R : Any?> findFieldConverterFor(type: KType): FieldConverter<T, R> =
             fieldConverters.find {
                 it.supportedType().isSupertypeOf(type)
             } as FieldConverter<T, R>?
                     ?: throw MappingException("No field converter found for type $type.")
 
     @Suppress("UNCHECKED_CAST")
-    fun <T, R> findFieldConverter(converter: KClass<out FieldConverter<*, *>>): FieldConverter<T, R> =
+    fun <T : Any?, R : Any?> findFieldConverter(converter: KClass<out FieldConverter<*, *>>): FieldConverter<T, R> =
             fieldConverters.find {
                 it::class == converter
             } as FieldConverter<T, R>?

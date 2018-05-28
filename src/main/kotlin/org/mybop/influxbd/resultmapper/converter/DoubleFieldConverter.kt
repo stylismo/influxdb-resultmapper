@@ -1,3 +1,3 @@
 package org.mybop.influxbd.resultmapper.converter
 
-interface DoubleFieldConverter<T> : FieldConverter<T, Double>
+interface DoubleFieldConverter<T> : FieldConverter<T, Double?>

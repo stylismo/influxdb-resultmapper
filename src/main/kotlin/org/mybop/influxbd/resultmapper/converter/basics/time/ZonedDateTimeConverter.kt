@@ -9,7 +9,12 @@ class ZonedDateTimeConverter : TimeConverter<ZonedDateTime> {
 
     override fun supportedType() = ZonedDateTime::class.createType()
 
-    override fun convert(instant: ZonedDateTime) = instant.toInstant().toEpochMilli()
+    override fun convert(instant: ZonedDateTime): Long {
+        val javaInstant = instant.toInstant()
+        return javaInstant.epochSecond * 1000000000L + javaInstant.nano
+    }
 
-    override fun precision() = TimeUnit.MILLISECONDS
+    override fun precision() = TimeUnit.NANOSECONDS
+
+    override fun reverse(value: String): ZonedDateTime = ZonedDateTime.parse(value)
 }

@@ -6,9 +6,12 @@ import java.util.concurrent.TimeUnit
 import kotlin.reflect.full.createType
 
 class InstantConverter : TimeConverter<Instant> {
+
     override fun supportedType() = Instant::class.createType()
 
-    override fun convert(instant: Instant) = instant.toEpochMilli()
+    override fun convert(instant: Instant) = instant.epochSecond * 1000000000L + instant.nano
 
-    override fun precision() = TimeUnit.MILLISECONDS
+    override fun precision() = TimeUnit.NANOSECONDS
+
+    override fun reverse(value: String): Instant = Instant.parse(value)
 }

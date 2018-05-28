@@ -5,7 +5,7 @@ import org.mybop.influxbd.resultmapper.Tag
 import org.mybop.influxbd.resultmapper.converter.TagConverter
 import kotlin.reflect.KProperty1
 
-internal data class TagMapping<K, T> private constructor(
+internal class TagMapping<K : Any, T : Any?> private constructor(
         val name: String,
         val property: KProperty1<K, T>,
         val tagConverter: TagConverter<T>

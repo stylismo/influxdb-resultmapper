@@ -4,7 +4,7 @@ import org.mybop.influxbd.resultmapper.converter.FieldConverter
 import kotlin.reflect.KClass
 
 /**
- * Annotation used on a field to be mapped as a field in influxdb request
+ * Annotation used on a field to be mapped as a field in influxDb request
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.PROPERTY)

@@ -5,7 +5,7 @@ import org.mybop.influxbd.resultmapper.Field
 import org.mybop.influxbd.resultmapper.converter.FieldConverter
 import kotlin.reflect.KProperty1
 
-internal data class FieldMapping<K, T, R> private constructor(
+internal class FieldMapping<K : Any, T : Any?, R : Any?> private constructor(
         val name: String,
         val property: KProperty1<K, T>,
         val fieldConverter: FieldConverter<T, R>
@@ -30,5 +30,5 @@ internal data class FieldMapping<K, T, R> private constructor(
             }
     )
 
-    fun extractField(value: K) = fieldConverter.convert(property.get(value))
+    fun extractField(value: K) = property.get(value)?.let { fieldConverter.convert(it) }
 }

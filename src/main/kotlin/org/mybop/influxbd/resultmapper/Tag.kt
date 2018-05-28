@@ -4,7 +4,7 @@ import org.mybop.influxbd.resultmapper.converter.TagConverter
 import kotlin.reflect.KClass
 
 /**
- * Annotation used on a field to be mapped as a tag in influxdb request
+ * Annotation used on a field to be mapped as a tag in influxDb request
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.PROPERTY)

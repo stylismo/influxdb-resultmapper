@@ -5,7 +5,7 @@ import org.mybop.influxbd.resultmapper.Time
 import org.mybop.influxbd.resultmapper.converter.TimeConverter
 import kotlin.reflect.KProperty1
 
-internal data class TimeMapping<K, T> private constructor(
+internal class TimeMapping<K : Any, T : Any?> private constructor(
         val property: KProperty1<K, T>,
         val timeConverter: TimeConverter<T>
 ) {

@@ -1,3 +1,3 @@
 package org.mybop.influxbd.resultmapper.converter
 
-interface FloatFieldConverter<T> : FieldConverter<T, Float>
+interface FloatFieldConverter<T> : FieldConverter<T, Float?>
