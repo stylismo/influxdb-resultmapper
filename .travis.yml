@@ -4,8 +4,8 @@ jdk:
   - oraclejdk8
 
 before_script:
- - wget http://s3.amazonaws.com/influxdb/influxdb_latest_amd64.deb
- - sudo dpkg -i influxdb_latest_amd64.deb
+ - wget https://dl.influxdata.com/influxdb/releases/influxdb_1.5.3_amd64.deb
+ - sudo dpkg -i influxdb_1.5.3_amd64.deb
  - sudo service influxdb start
 
 before_cache:
