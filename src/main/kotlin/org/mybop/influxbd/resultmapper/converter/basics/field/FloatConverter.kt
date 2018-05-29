@@ -1,13 +1,13 @@
 package org.mybop.influxbd.resultmapper.converter.basics.field
 
-import org.mybop.influxbd.resultmapper.converter.FloatFieldConverter
+import org.mybop.influxbd.resultmapper.converter.NumberFieldConverter
 import kotlin.reflect.full.createType
 
-class FloatConverter : FloatFieldConverter<Float?> {
+class FloatConverter : NumberFieldConverter<Float?> {
 
     override fun supportedType() = Float::class.createType(nullable = true)
 
-    override fun convert(value: Float?) = value
+    override fun convert(value: Float?) = value?.toDouble()
 
-    override fun reverse(value: Float?) = value
+    override fun reverse(value: Double?) = value?.toFloat()
 }

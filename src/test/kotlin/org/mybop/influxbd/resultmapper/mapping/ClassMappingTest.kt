@@ -8,32 +8,13 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mybop.influxbd.resultmapper.ConverterRegistry
+import org.mybop.influxbd.resultmapper.DbTest
 import org.mybop.influxbd.resultmapper.Foo
 import org.mybop.influxbd.resultmapper.Key
 import java.time.Instant
 
 
-class ClassMappingTest {
-
-    private lateinit var influxDB: InfluxDB
-
-    private val database = "testDb"
-
-    private val retentionPolicy = "testRp"
-
-    @Before
-    fun setUp() {
-        influxDB = InfluxDBFactory.connect("http://localhost:8086", "user", "")
-        influxDB.createDatabase(database)
-        influxDB.createRetentionPolicy(retentionPolicy, database, "7d", "1d", 1)
-    }
-
-    @After
-    fun tearDown() {
-        influxDB.dropRetentionPolicy(database, retentionPolicy)
-        influxDB.deleteDatabase(database)
-        influxDB.close()
-    }
+class ClassMappingTest : DbTest() {
 
     @Test
     fun mapping() {

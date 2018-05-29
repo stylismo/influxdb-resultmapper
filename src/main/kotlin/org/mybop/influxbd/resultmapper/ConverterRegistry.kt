@@ -15,7 +15,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.isSupertypeOf
 
-internal class ConverterRegistry {
+class ConverterRegistry {
 
     private val timeConverters = mutableSetOf<TimeConverter<out Any?>>()
 

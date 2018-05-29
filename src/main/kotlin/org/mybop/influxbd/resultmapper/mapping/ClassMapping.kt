@@ -2,28 +2,23 @@ package org.mybop.influxbd.resultmapper.mapping
 
 import org.influxdb.dto.Point
 import org.influxdb.dto.QueryResult
-import org.mybop.influxbd.resultmapper.ConverterRegistry
-import org.mybop.influxbd.resultmapper.Field
-import org.mybop.influxbd.resultmapper.Key
-import org.mybop.influxbd.resultmapper.MappingException
-import org.mybop.influxbd.resultmapper.Measurement
-import org.mybop.influxbd.resultmapper.Tag
-import org.mybop.influxbd.resultmapper.Time
-import org.mybop.influxbd.resultmapper.converter.TimeConverter
+import org.mybop.influxbd.resultmapper.*
+import java.beans.BeanInfo
+import java.beans.Introspector
 import kotlin.reflect.KClass
-import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
 
-internal class ClassMapping<T : Any> private constructor(
-        private val clazz: KClass<T>,
+class ClassMapping<K : Any> private constructor(
+        private val clazz: KClass<K>,
         private val measurementName: String,
-        private val timeMapping: TimeMapping<T, *>,
-        private val fieldMappings: Set<FieldMapping<T, *, *>>,
-        private val tagMappings: Set<TagMapping<T, *>>
+        private val timeMapping: TimeMapping<K, *>,
+        private val fieldMappings: Set<FieldMapping<K, *, *>>,
+        private val tagMappings: Set<TagMapping<K, *>>
 ) {
     constructor(
-            clazz: KClass<T>,
+            clazz: KClass<K>,
+            beanInfo: BeanInfo,
             measurement: Measurement,
             registry: ConverterRegistry
     ) : this(
@@ -43,7 +38,7 @@ internal class ClassMapping<T : Any> private constructor(
                         time != null
                     }
                     ?.let { (property, time) ->
-                        TimeMapping(property, time!!, registry)
+                        TimeMapping(property, beanInfo.propertyDescriptors.find { it.name == property.name }!!, time!!, registry)
                     }
                     ?: throw MappingException("No @Time property found in $clazz"),
             fieldMappings =
@@ -53,7 +48,7 @@ internal class ClassMapping<T : Any> private constructor(
                     }
                     .filter { (_, field) -> field != null }
                     .map { (property, field) ->
-                        FieldMapping<T, Any?, Any?>(property, field!!, registry)
+                        FieldMapping<K, Any?, Any?>(property, beanInfo.propertyDescriptors.find { it.name == property.name }!!, field!!, registry)
                     }
                     .toSet(),
             tagMappings =
@@ -63,18 +58,18 @@ internal class ClassMapping<T : Any> private constructor(
                     }
                     .filter { (_, tag) -> tag != null }
                     .map { (property, tag) ->
-                        TagMapping<T, Any?>(property, tag!!, registry)
+                        TagMapping<K, Any?>(property, beanInfo.propertyDescriptors.find { it.name == property.name }!!, tag!!, registry)
                     }
                     .toSet()
     )
 
-    fun toPoint(value: T): Point = Point.measurement(measurementName)
-            .time(timeMapping.extractTime(value), timeMapping.precision())
-            .fields(fieldMappings.associate { Pair(it.name, it.extractField(value)) })
-            .tag(tagMappings.associate { Pair(it.name, it.extractTag(value)) })
+    fun toPoint(value: K): Point = Point.measurement(measurementName)
+            .time(timeMapping.extractField(value), timeMapping.precision())
+            .fields(fieldMappings.associate { Pair(it.mappedName, it.extractField(value)) })
+            .tag(tagMappings.associate { Pair(it.mappedName, it.extractField(value)) })
             .build()
 
-    fun parseQueryResult(queryResult: QueryResult): List<Map<Key, List<T>>> {
+    fun parseQueryResult(queryResult: QueryResult): List<Map<Key, List<K>>> {
         if (queryResult.hasError()) {
             throw MappingException(queryResult.error)
         }
@@ -87,7 +82,7 @@ internal class ClassMapping<T : Any> private constructor(
                 .map { parseResult(it) }
     }
 
-    private fun parseResult(result: QueryResult.Result): Map<Key, List<T>> {
+    private fun parseResult(result: QueryResult.Result): Map<Key, List<K>> {
         if (result.hasError()) {
             throw MappingException(result.error)
         }
@@ -107,17 +102,17 @@ internal class ClassMapping<T : Any> private constructor(
 
         return Key(
                 series.tags.entries
-                        .associate { Pair(it.key, findTagMapper(it.key).tagConverter.reverse(it.value)) }
+                        .associate { Pair(it.key, findTagMapper(it.key).parseResult(it.value)) }
         )
     }
 
-    private fun findTagMapper(name: String): TagMapping<T, *> {
+    private fun findTagMapper(name: String): TagMapping<K, *> {
         return tagMappings.find {
-            it.name == name
+            it.mappedName == name
         } ?: throw MappingException("No tag mapping for key $name")
     }
 
-    private fun parseSeries(series: QueryResult.Series): List<T> {
+    private fun parseSeries(series: QueryResult.Series): List<K> {
         if (series.values?.isEmpty() != false) {
             return emptyList()
         }
@@ -128,7 +123,7 @@ internal class ClassMapping<T : Any> private constructor(
         }
     }
 
-    private fun parseModel(time: String, columns: Map<String, Any>): T {
+    private fun parseModel(time: String, columns: Map<String, Any>): K {
         val properties = listOf<Pair<String, Any?>>(readTime(time))
                 .plus(columns.map {
                     when {
@@ -151,10 +146,8 @@ internal class ClassMapping<T : Any> private constructor(
                 .filterKeys { property ->
                     constructor.parameters.none { it.name == property }
                 }
-                .forEach { entry ->
-                    val property = clazz.memberProperties.find { it.name == entry.key }
-                            as KMutableProperty1<T, Any?>
-                    property.set(result, entry.value)
+                .forEach { property ->
+                    writeProperty(property.key, result, property.value)
                 }
 
         return result
@@ -162,35 +155,49 @@ internal class ClassMapping<T : Any> private constructor(
 
     private fun findConstructor(attributes: Collection<String>) = clazz.constructors
             .sortedByDescending { it.parameters.size }
-            .first { it.parameters.map { it.name }.containsAll(attributes) }
+            .first { attributes.containsAll(it.parameters.map { it.name }) }
 
     private fun <R : Any?> readTime(value: String): Pair<String, R> {
         @Suppress("UNCHECKED_CAST")
-        return Pair(timeMapping.property.name, (timeMapping.timeConverter as TimeConverter<R>).reverse(value))
+        return Pair(timeMapping.property.name, (timeMapping as TimeMapping<K, R>).parseResult(value))
     }
 
-    private fun isField(name: String) = fieldMappings.find { it.name == name } != null
+    private fun isField(name: String) = fieldMappings.find { it.mappedName == name } != null
 
     private fun <R : Any?, S : Any?> readField(name: String, value: R): Pair<String, S> {
         @Suppress("UNCHECKED_CAST")
-        val mapping = fieldMappings.first { it.name == name } as FieldMapping<T, S, R>
+        val mapping = fieldMappings.first { it.mappedName == name } as FieldMapping<K, S, R>
 
-        return Pair(mapping.property.name, mapping.fieldConverter.reverse(value))
+        return Pair(mapping.property.name, mapping.parseResult(value))
     }
 
-    private fun isTag(name: String) = tagMappings.find { it.name == name } != null
+    private fun isTag(name: String) = tagMappings.find { it.mappedName == name } != null
 
     private fun <R : Any?> readTag(name: String, value: String?): Pair<String, R> {
         @Suppress("UNCHECKED_CAST")
-        val mapping = tagMappings.first { it.name == name } as TagMapping<T, R>
+        val mapping = tagMappings.first { it.mappedName == name } as TagMapping<K, R>
 
-        return Pair(mapping.property.name, mapping.tagConverter.reverse(value))
+        return Pair(mapping.property.name, mapping.parseResult(value))
+    }
+
+    private fun <R : Any?> writeProperty(propertyName: String, obj: K, value: R) {
+        @Suppress("UNCHECKED_CAST")
+        val mapping = fieldMappings.plus(tagMappings).plus(timeMapping)
+                .find { it.propertyName == propertyName } as? PropertyMapping<K, R, *, *>
+                ?: throw MappingException("Mapping not found for property $propertyName")
+
+        mapping.writeField(obj, value)
     }
 
     companion object {
+        fun <T : Any> read(clazz: Class<T>, registry: ConverterRegistry) = read(clazz.kotlin, registry)
+
         fun <T : Any> read(clazz: KClass<T>, registry: ConverterRegistry): ClassMapping<T> =
-                ClassMapping(clazz, clazz.findAnnotation()
-                        ?: throw MappingException("Class $clazz not annotated with @Measurement."),
+                ClassMapping(
+                        clazz,
+                        Introspector.getBeanInfo(clazz.java),
+                        clazz.findAnnotation()
+                                ?: throw MappingException("Class $clazz not annotated with @Measurement."),
                         registry
                 )
     }

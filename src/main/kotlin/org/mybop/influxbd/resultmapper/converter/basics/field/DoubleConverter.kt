@@ -1,9 +1,9 @@
 package org.mybop.influxbd.resultmapper.converter.basics.field
 
-import org.mybop.influxbd.resultmapper.converter.DoubleFieldConverter
+import org.mybop.influxbd.resultmapper.converter.NumberFieldConverter
 import kotlin.reflect.full.createType
 
-class DoubleConverter : DoubleFieldConverter<Double?> {
+class DoubleConverter : NumberFieldConverter<Double?> {
 
     override fun supportedType() = Double::class.createType(nullable = true)
 
