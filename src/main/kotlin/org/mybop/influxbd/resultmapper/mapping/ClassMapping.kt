@@ -155,7 +155,8 @@ class ClassMapping<K : Any> private constructor(
 
     private fun findConstructor(attributes: Collection<String>) = clazz.constructors
             .sortedByDescending { it.parameters.size }
-            .first { attributes.containsAll(it.parameters.map { it.name }) }
+            .find { attributes.containsAll(it.parameters.map { it.name }) }
+            ?: throw MappingException("No constructor available for class ${clazz.qualifiedName}")
 
     private fun <R : Any?> readTime(value: String): Pair<String, R> {
         @Suppress("UNCHECKED_CAST")

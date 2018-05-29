@@ -3,12 +3,7 @@ package org.mybop.influxbd.resultmapper
 import org.mybop.influxbd.resultmapper.converter.FieldConverter
 import org.mybop.influxbd.resultmapper.converter.TagConverter
 import org.mybop.influxbd.resultmapper.converter.TimeConverter
-import org.mybop.influxbd.resultmapper.converter.basics.tag.BooleanConverter
-import org.mybop.influxbd.resultmapper.converter.basics.tag.DoubleConverter
-import org.mybop.influxbd.resultmapper.converter.basics.tag.FloatConverter
-import org.mybop.influxbd.resultmapper.converter.basics.tag.IntegerConverter
-import org.mybop.influxbd.resultmapper.converter.basics.tag.LongConverter
-import org.mybop.influxbd.resultmapper.converter.basics.tag.StringConverter
+import org.mybop.influxbd.resultmapper.converter.basics.tag.*
 import org.mybop.influxbd.resultmapper.converter.basics.time.InstantConverter
 import org.mybop.influxbd.resultmapper.converter.basics.time.ZonedDateTimeConverter
 import kotlin.reflect.KClass
@@ -42,6 +37,10 @@ class ConverterRegistry {
         fieldConverters.add(org.mybop.influxbd.resultmapper.converter.basics.field.StringConverter())
     }
 
+    fun registerTimeConverter(timeConverter: TimeConverter<*>) {
+        timeConverters.add(timeConverter)
+    }
+
     @Suppress("UNCHECKED_CAST")
     fun <T : Any?> findTimeConverterFor(type: KType): TimeConverter<T> =
             timeConverters.find {
@@ -56,6 +55,10 @@ class ConverterRegistry {
             } as TimeConverter<T>?
                     ?: throw MappingException("No time converter with class $converter found.")
 
+    fun registerTagConverter(tagConverter: TagConverter<*>) {
+        tagConverters.add(tagConverter)
+    }
+
     @Suppress("UNCHECKED_CAST")
     fun <T : Any?> findTagConverterFor(type: KType): TagConverter<T> =
             tagConverters.find {
@@ -69,6 +72,10 @@ class ConverterRegistry {
                 it::class == converter
             } as TagConverter<T>?
                     ?: throw MappingException("No tag converter with class $converter found.")
+
+    fun registerFieldConverter(fieldConverter: FieldConverter<*, *>) {
+        fieldConverters.add(fieldConverter)
+    }
 
     @Suppress("UNCHECKED_CAST")
     fun <T : Any?, R : Any?> findFieldConverterFor(type: KType): FieldConverter<T, R> =
