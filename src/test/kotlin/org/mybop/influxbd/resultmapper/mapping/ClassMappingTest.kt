@@ -1,11 +1,7 @@
 package org.mybop.influxbd.resultmapper.mapping
 
 import org.assertj.core.api.Assertions.assertThat
-import org.influxdb.InfluxDB
-import org.influxdb.InfluxDBFactory
 import org.influxdb.dto.BoundParameterQuery
-import org.junit.After
-import org.junit.Before
 import org.junit.Test
 import org.mybop.influxbd.resultmapper.ConverterRegistry
 import org.mybop.influxbd.resultmapper.DbTest
@@ -28,18 +24,18 @@ class ClassMappingTest : DbTest() {
                 "value"
         )
 
-        val point = mapping.toPoint(foo)
+        val point = mapping.writer.toPoint(foo)
 
         influxDB.write(database, retentionPolicy, point)
 
         val result = influxDB.query(
                 BoundParameterQuery.QueryBuilder
-                        .newQuery("SELECT * FROM \"$retentionPolicy\".\"Foo\"")
+                        .newQuery("SELECT * FROM \"$retentionPolicy\".\"${mapping.writer.measurementName}\"")
                         .forDatabase(database)
                         .create()
         )
 
-        val parsed = mapping.parseQueryResult(result)
+        val parsed = mapping.reader.parseQueryResult(result)
         assertThat(parsed.size).isEqualTo(1)
         assertThat(parsed[0].size).isEqualTo(1)
 

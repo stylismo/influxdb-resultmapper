@@ -7,45 +7,43 @@ import org.mybop.influxbd.resultmapper.converter.TagConverter
 import java.beans.PropertyDescriptor
 import java.lang.reflect.Method
 import kotlin.reflect.KProperty1
+import kotlin.reflect.full.findAnnotation
 
-internal class TagMapping<K : Any, T : Any?> private constructor(
-        override val mappedName: String,
-        val property: KProperty1<K, T>,
-        val getter: Method,
-        val setter: Method?,
-        val tagConverter: TagConverter<T>
+internal class TagMapping<K : Any, T : Any?> constructor(
+        private val property: KProperty1<K, T>,
+        propertyDescriptor: PropertyDescriptor,
+        registry: ConverterRegistry
 ) : PropertyMapping<K, T, String?, String?> {
 
-    constructor(
-            property: KProperty1<K, T>,
-            propertyDescriptor: PropertyDescriptor,
-            tag: Tag,
-            registry: ConverterRegistry
-    ) : this(
-            mappedName =
-            if (tag.name.isBlank()) {
+    private val annotation: Tag = property.findAnnotation()!!
+
+    override val mappedName: String
+        get() =
+            if (annotation.name.isBlank()) {
                 property.name
             } else {
-                tag.name
-            },
-            getter = propertyDescriptor.readMethod,
-            setter = propertyDescriptor.writeMethod,
-            property = property,
-            tagConverter =
-            if (tag.converter == TagConverter::class) {
-                registry.findTagConverterFor(property.returnType)
-            } else {
-                registry.findTagConverter(tag.converter)
+                annotation.name
             }
-    )
 
     override val propertyName: String
         get() = property.name
 
-    @Suppress("UNCHECKED_CAST")
-    override fun extractField(value: K) = getter.invoke(value)?.let { tagConverter.convert(it as T) }
+    private val getter: Method = propertyDescriptor.readMethod
+            ?: throw MappingException("Getter not found for property $propertyName")
 
-    override fun parseResult(res: String?) = tagConverter.reverse(res)
+    private val setter: Method? = propertyDescriptor.writeMethod
+
+    private val converter: TagConverter<T> =
+            if (annotation.converter == TagConverter::class) {
+                registry.findTagConverterFor(property.returnType)
+            } else {
+                registry.findTagConverter(annotation.converter)
+            }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun extractField(value: K) = getter.invoke(value)?.let { converter.convert(it as T) }
+
+    override fun parseResult(res: String?) = converter.reverse(res)
 
     override fun writeField(obj: K, value: T) {
         if (setter == null) {

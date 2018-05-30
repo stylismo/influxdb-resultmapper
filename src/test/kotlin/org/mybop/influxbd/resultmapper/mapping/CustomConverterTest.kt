@@ -3,7 +3,11 @@ package org.mybop.influxbd.resultmapper.mapping
 import org.assertj.core.api.Assertions
 import org.influxdb.dto.BoundParameterQuery
 import org.junit.Test
-import org.mybop.influxbd.resultmapper.*
+import org.mybop.influxbd.resultmapper.ConverterRegistry
+import org.mybop.influxbd.resultmapper.DbTest
+import org.mybop.influxbd.resultmapper.Key
+import org.mybop.influxbd.resultmapper.TimestampMessage
+import org.mybop.influxbd.resultmapper.TimestampMillisConverter
 
 class CustomConverterTest : DbTest() {
 
@@ -14,19 +18,19 @@ class CustomConverterTest : DbTest() {
 
         val mapping = ClassMapping.read(TimestampMessage::class, registry)
 
-        val timestampMessage = TimestampMessage(System.currentTimeMillis())
+        val timestampMessage = TimestampMessage(System.currentTimeMillis(), true)
         timestampMessage.message = "super message"
 
-        influxDB.write(database, retentionPolicy, mapping.toPoint(timestampMessage))
+        influxDB.write(database, retentionPolicy, mapping.writer.toPoint(timestampMessage))
 
         val result = influxDB.query(
                 BoundParameterQuery.QueryBuilder
-                        .newQuery("SELECT * FROM \"$retentionPolicy\".\"message\"")
+                        .newQuery("SELECT * FROM \"$retentionPolicy\".\"${mapping.writer.measurementName}\"")
                         .forDatabase(database)
                         .create()
         )
 
-        val parsed = mapping.parseQueryResult(result)
+        val parsed = mapping.reader.parseQueryResult(result)
         Assertions.assertThat(parsed.size).isEqualTo(1)
         Assertions.assertThat(parsed[0].size).isEqualTo(1)
 

@@ -6,5 +6,7 @@ package org.mybop.influxbd.resultmapper
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
 annotation class Measurement(
-        val name: String = ""
+        val name: String = "",
+        val retentionPolicy: String = "",
+        val database: String = ""
 )
