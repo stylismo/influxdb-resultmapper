@@ -7,6 +7,7 @@ import org.mybop.influxbd.resultmapper.ConverterRegistry
 import org.mybop.influxbd.resultmapper.DbTest
 import org.mybop.influxbd.resultmapper.Foo
 import org.mybop.influxbd.resultmapper.Key
+import org.mybop.influxbd.resultmapper.Strategy
 import java.time.Instant
 
 
@@ -21,6 +22,7 @@ class ClassMappingTest : DbTest() {
         val foo = Foo(
                 Instant.now(),
                 "key",
+                Strategy.COMPLETE,
                 "value"
         )
 

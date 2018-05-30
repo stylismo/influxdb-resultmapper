@@ -8,5 +8,5 @@ interface FieldConverter<T, R> {
 
     fun convert(value: T): R
 
-    fun reverse(value: R): T
+    fun reverse(value: R, type: KType): T
 }

@@ -4,6 +4,8 @@ import org.influxdb.dto.BoundParameterQuery;
 import org.influxdb.dto.QueryResult;
 import org.junit.Test;
 import org.mybop.influxbd.resultmapper.Bar;
+import org.mybop.influxbd.resultmapper.Category;
+import org.mybop.influxbd.resultmapper.Color;
 import org.mybop.influxbd.resultmapper.ConverterRegistry;
 import org.mybop.influxbd.resultmapper.DbTest;
 import org.mybop.influxbd.resultmapper.Key;
@@ -21,7 +23,9 @@ public class JavaMappingTest extends DbTest {
 
         final Bar bar = new Bar();
         bar.setCreatedAt(ZonedDateTime.now());
+        bar.setCategory(Category.B);
         bar.setNumber(12);
+        bar.setColor(Color.BLUE);
         bar.setZone("pt1");
 
         getInfluxDB().write(getDatabase(), getRetentionPolicy(), mapping.getWriter().toPoint(bar));

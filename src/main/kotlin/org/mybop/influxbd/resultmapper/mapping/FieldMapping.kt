@@ -43,7 +43,7 @@ internal class FieldMapping<K : Any, T : Any?, R : Any?> constructor(
     @Suppress("UNCHECKED_CAST")
     override fun extractField(value: K) = getter.invoke(value)?.let { converter.convert(it as T) }
 
-    override fun parseResult(res: R) = converter.reverse(res)
+    override fun parseResult(res: R) = converter.reverse(res, property.returnType)
 
     override fun writeField(obj: K, value: T) {
         if (setter == null) {

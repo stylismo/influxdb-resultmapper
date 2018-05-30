@@ -1,6 +1,7 @@
 package org.mybop.influxbd.resultmapper.converter.basics.tag
 
 import org.mybop.influxbd.resultmapper.converter.TagConverter
+import kotlin.reflect.KType
 import kotlin.reflect.full.createType
 
 class BooleanConverter : TagConverter<Boolean?> {
@@ -9,5 +10,5 @@ class BooleanConverter : TagConverter<Boolean?> {
 
     override fun convert(key: Boolean?) = key?.toString()
 
-    override fun reverse(key: String?) = key?.toBoolean()
+    override fun reverse(key: String?, type: KType) = key?.toBoolean()
 }

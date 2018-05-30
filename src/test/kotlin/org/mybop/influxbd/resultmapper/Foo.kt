@@ -8,6 +8,8 @@ data class Foo(
         val time: Instant,
         @Tag
         val key: String,
+        @Tag
+        val strategy: Strategy,
         @Field
         val bar: String
 )

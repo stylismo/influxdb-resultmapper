@@ -8,5 +8,5 @@ interface TagConverter<T : Any?> {
 
     fun convert(key: T): String?
 
-    fun reverse(key: String?): T
+    fun reverse(key: String?, type: KType): T
 }

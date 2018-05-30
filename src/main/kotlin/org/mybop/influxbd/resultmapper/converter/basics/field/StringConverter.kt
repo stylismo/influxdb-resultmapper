@@ -1,6 +1,7 @@
 package org.mybop.influxbd.resultmapper.converter.basics.field
 
 import org.mybop.influxbd.resultmapper.converter.StringFieldConverter
+import kotlin.reflect.KType
 import kotlin.reflect.full.createType
 
 class StringConverter : StringFieldConverter<String?> {
@@ -9,5 +10,5 @@ class StringConverter : StringFieldConverter<String?> {
 
     override fun convert(value: String?) = value
 
-    override fun reverse(value: String?) = value
+    override fun reverse(value: String?, type: KType) = value
 }

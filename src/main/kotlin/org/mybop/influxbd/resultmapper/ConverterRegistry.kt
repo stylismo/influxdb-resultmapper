@@ -3,7 +3,13 @@ package org.mybop.influxbd.resultmapper
 import org.mybop.influxbd.resultmapper.converter.FieldConverter
 import org.mybop.influxbd.resultmapper.converter.TagConverter
 import org.mybop.influxbd.resultmapper.converter.TimeConverter
-import org.mybop.influxbd.resultmapper.converter.basics.tag.*
+import org.mybop.influxbd.resultmapper.converter.basics.tag.BooleanConverter
+import org.mybop.influxbd.resultmapper.converter.basics.tag.DoubleConverter
+import org.mybop.influxbd.resultmapper.converter.basics.tag.EnumConverter
+import org.mybop.influxbd.resultmapper.converter.basics.tag.FloatConverter
+import org.mybop.influxbd.resultmapper.converter.basics.tag.IntegerConverter
+import org.mybop.influxbd.resultmapper.converter.basics.tag.LongConverter
+import org.mybop.influxbd.resultmapper.converter.basics.tag.StringConverter
 import org.mybop.influxbd.resultmapper.converter.basics.time.InstantConverter
 import org.mybop.influxbd.resultmapper.converter.basics.time.ZonedDateTimeConverter
 import kotlin.reflect.KClass
@@ -28,6 +34,7 @@ class ConverterRegistry {
         tagConverters.add(IntegerConverter())
         tagConverters.add(LongConverter())
         tagConverters.add(StringConverter())
+        tagConverters.add(EnumConverter())
 
         fieldConverters.add(org.mybop.influxbd.resultmapper.converter.basics.field.BooleanConverter())
         fieldConverters.add(org.mybop.influxbd.resultmapper.converter.basics.field.DoubleConverter())
@@ -35,6 +42,7 @@ class ConverterRegistry {
         fieldConverters.add(org.mybop.influxbd.resultmapper.converter.basics.field.IntegerConverter())
         fieldConverters.add(org.mybop.influxbd.resultmapper.converter.basics.field.LongConverter())
         fieldConverters.add(org.mybop.influxbd.resultmapper.converter.basics.field.StringConverter())
+        fieldConverters.add(org.mybop.influxbd.resultmapper.converter.basics.field.EnumConverter())
     }
 
     fun registerTimeConverter(timeConverter: TimeConverter<*>) {
@@ -61,10 +69,11 @@ class ConverterRegistry {
 
     @Suppress("UNCHECKED_CAST")
     fun <T : Any?> findTagConverterFor(type: KType): TagConverter<T> =
+
             tagConverters.find {
                 it.supportedType().isSupertypeOf(type)
             } as TagConverter<T>?
-                    ?: throw MappingException("No tag converter found for type $type.")
+                    ?: throw MappingException("No tag converter found for type '$type'.")
 
     @Suppress("UNCHECKED_CAST")
     fun <T : Any?> findTagConverter(converter: KClass<out TagConverter<*>>): TagConverter<T> =
