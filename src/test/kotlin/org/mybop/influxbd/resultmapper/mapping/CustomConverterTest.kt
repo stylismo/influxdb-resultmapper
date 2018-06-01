@@ -3,7 +3,6 @@ package org.mybop.influxbd.resultmapper.mapping
 import org.assertj.core.api.Assertions
 import org.influxdb.dto.BoundParameterQuery
 import org.junit.Test
-import org.mybop.influxbd.resultmapper.ClassMappingIntrospector
 import org.mybop.influxbd.resultmapper.ConverterRegistry
 import org.mybop.influxbd.resultmapper.DbTest
 import org.mybop.influxbd.resultmapper.Key
@@ -17,7 +16,7 @@ class CustomConverterTest : DbTest() {
         val registry = ConverterRegistry()
         registry.registerTimeConverter(TimestampMillisConverter())
 
-        val (reader, writer) = ClassMappingIntrospector(registry).mapper(TimestampMessage::class)
+        val (reader, writer) = ClassMappingIntrospector.mapper(TimestampMessage::class, registry)
 
         val timestampMessage = TimestampMessage(System.currentTimeMillis(), true)
         timestampMessage.message = "super message"

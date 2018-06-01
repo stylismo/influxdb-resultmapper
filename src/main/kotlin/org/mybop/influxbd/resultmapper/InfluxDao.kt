@@ -2,17 +2,18 @@ package org.mybop.influxbd.resultmapper
 
 import org.influxdb.InfluxDB
 import org.influxdb.dto.Query
+import org.mybop.influxbd.resultmapper.mapping.ClassMappingIntrospector
 import org.mybop.influxbd.resultmapper.mapping.ClassReader
 import org.mybop.influxbd.resultmapper.mapping.ClassWriter
 import kotlin.reflect.KClass
 
 class InfluxDao<K : Any>(
         clazz: KClass<K>,
-        introspector: ClassMappingIntrospector,
+        registry: ConverterRegistry,
         private val client: InfluxDB
 ) {
 
-    constructor(clazz: Class<K>, introspector: ClassMappingIntrospector, client: InfluxDB) : this(clazz.kotlin, introspector, client)
+    constructor(clazz: Class<K>, registry: ConverterRegistry, client: InfluxDB) : this(clazz.kotlin, registry, client)
 
     var consistencyLevel: InfluxDB.ConsistencyLevel = InfluxDB.ConsistencyLevel.ONE
 
@@ -30,7 +31,7 @@ class InfluxDao<K : Any>(
         get() = writer.measurementName
 
     init {
-        val (reader, writer) = introspector.mapper(clazz)
+        val (reader, writer) = ClassMappingIntrospector.mapper(clazz, registry)
         this.reader = reader
         this.writer = writer
     }

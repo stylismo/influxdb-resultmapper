@@ -4,7 +4,7 @@ import org.mybop.influxbd.resultmapper.converter.NumberFieldConverter
 import kotlin.reflect.KType
 import kotlin.reflect.full.createType
 
-class FloatConverter : NumberFieldConverter<Float?> {
+internal class FloatConverter : NumberFieldConverter<Float?> {
 
     override fun supportedType() = Float::class.createType(nullable = true)
 

@@ -10,17 +10,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class JavaInfluxDaoTest extends DbTest {
 
-    private ConverterRegistry registry;
-
-    private ClassMappingIntrospector introspector;
-
     private InfluxDao<Bar> dao;
 
     @Before
     public void setUpRegistry() {
-        registry = new ConverterRegistry();
-        introspector = new ClassMappingIntrospector(registry);
-        dao = new InfluxDao<>(Bar.class, introspector, getInfluxDB());
+        final ConverterRegistry registry = new ConverterRegistry();
+        dao = new InfluxDao<>(Bar.class, registry, getInfluxDB());
     }
 
     @Test

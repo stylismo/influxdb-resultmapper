@@ -4,7 +4,7 @@ import org.mybop.influxbd.resultmapper.converter.BooleanFieldConverter
 import kotlin.reflect.KType
 import kotlin.reflect.full.createType
 
-class BooleanConverter : BooleanFieldConverter<Boolean?> {
+internal class BooleanConverter : BooleanFieldConverter<Boolean?> {
 
     override fun supportedType() = Boolean::class.createType(nullable = true)
 

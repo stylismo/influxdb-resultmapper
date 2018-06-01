@@ -20,6 +20,5 @@ deploy:
   provider: script
   script: ./gradlew bintrayUpload
   on:
-    branch:
-      - master
-      - /^release//.*$/
+    all_branches: true
+    condition: $TRAVIS_BRANCH =~ ^release\/.*$

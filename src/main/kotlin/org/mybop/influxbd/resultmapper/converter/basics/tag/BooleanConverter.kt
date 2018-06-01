@@ -4,7 +4,7 @@ import org.mybop.influxbd.resultmapper.converter.TagConverter
 import kotlin.reflect.KType
 import kotlin.reflect.full.createType
 
-class BooleanConverter : TagConverter<Boolean?> {
+internal class BooleanConverter : TagConverter<Boolean?> {
 
     override fun supportedType() = Boolean::class.createType(nullable = true)
 

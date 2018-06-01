@@ -5,7 +5,6 @@ import org.influxdb.dto.QueryResult;
 import org.junit.Test;
 import org.mybop.influxbd.resultmapper.Bar;
 import org.mybop.influxbd.resultmapper.Category;
-import org.mybop.influxbd.resultmapper.ClassMappingIntrospector;
 import org.mybop.influxbd.resultmapper.Color;
 import org.mybop.influxbd.resultmapper.ConverterRegistry;
 import org.mybop.influxbd.resultmapper.DbTest;
@@ -22,10 +21,10 @@ public class JavaMappingTest extends DbTest {
     @Test
     public void simpleMapping() {
         final ConverterRegistry registry = new ConverterRegistry();
-        final ClassMappingIntrospector mapping = new ClassMappingIntrospector(registry);
+        final ClassMappingIntrospector introspector = ClassMappingIntrospector.INSTANCE;
 
-        final ClassReader<Bar> reader = mapping.reader(Bar.class);
-        final ClassWriter<Bar> writer = mapping.writer(Bar.class);
+        final ClassReader<Bar> reader = introspector.reader(Bar.class, registry);
+        final ClassWriter<Bar> writer = introspector.writer(Bar.class, registry);
 
         final Bar bar = new Bar();
         bar.setCreatedAt(ZonedDateTime.now());

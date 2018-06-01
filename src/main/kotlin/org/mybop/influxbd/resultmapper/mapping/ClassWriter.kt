@@ -8,7 +8,7 @@ import org.mybop.influxbd.resultmapper.Measurement
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 
-class ClassWriter<K : Any> internal constructor(
+internal class ClassWriter<K : Any> internal constructor(
         private val clazz: KClass<K>,
         private val timeMapping: TimeMapping<K, *>,
         private val fieldMappings: Set<FieldMapping<K, *, *>>,

@@ -5,7 +5,7 @@ import java.time.Instant
 import java.util.concurrent.TimeUnit
 import kotlin.reflect.full.createType
 
-class InstantConverter : TimeConverter<Instant> {
+internal class InstantConverter : TimeConverter<Instant> {
 
     override fun supportedType() = Instant::class.createType()
 

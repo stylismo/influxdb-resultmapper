@@ -3,7 +3,6 @@ package org.mybop.influxbd.resultmapper.mapping
 import org.assertj.core.api.Assertions.assertThat
 import org.influxdb.dto.BoundParameterQuery
 import org.junit.Test
-import org.mybop.influxbd.resultmapper.ClassMappingIntrospector
 import org.mybop.influxbd.resultmapper.ConverterRegistry
 import org.mybop.influxbd.resultmapper.DbTest
 import org.mybop.influxbd.resultmapper.Foo
@@ -16,7 +15,7 @@ class ClassMappingTest : DbTest() {
 
     @Test
     fun mapping() {
-        val (reader, writer) = ClassMappingIntrospector(ConverterRegistry()).mapper(Foo::class)
+        val (reader, writer) = ClassMappingIntrospector.mapper(Foo::class, ConverterRegistry())
 
         val foo = Foo(
                 Instant.now(),

@@ -4,7 +4,7 @@ import org.mybop.influxbd.resultmapper.converter.StringFieldConverter
 import kotlin.reflect.KType
 import kotlin.reflect.full.createType
 
-class StringConverter : StringFieldConverter<String?> {
+internal class StringConverter : StringFieldConverter<String?> {
 
     override fun supportedType() = String::class.createType(nullable = true)
 

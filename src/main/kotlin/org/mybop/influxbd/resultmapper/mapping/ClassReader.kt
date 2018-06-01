@@ -5,7 +5,7 @@ import org.mybop.influxbd.resultmapper.Key
 import org.mybop.influxbd.resultmapper.MappingException
 import kotlin.reflect.KClass
 
-class ClassReader<K : Any> internal constructor(
+internal class ClassReader<K : Any> internal constructor(
         private val clazz: KClass<K>,
         private val timeMapping: TimeMapping<K, *>,
         private val fieldMappings: Set<FieldMapping<K, *, *>>,

@@ -1,6 +1,6 @@
 package org.mybop.influxbd.resultmapper.mapping
 
-interface PropertyMapping<K : Any, T : Any?, R : Any?, S : Any?> {
+internal interface PropertyMapping<K : Any, T : Any?, R : Any?, S : Any?> {
 
     val mappedName: String
 
