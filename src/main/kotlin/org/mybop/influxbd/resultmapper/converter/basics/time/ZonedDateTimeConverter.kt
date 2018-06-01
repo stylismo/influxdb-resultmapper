@@ -5,7 +5,7 @@ import java.time.ZonedDateTime
 import java.util.concurrent.TimeUnit
 import kotlin.reflect.full.createType
 
-class ZonedDateTimeConverter : TimeConverter<ZonedDateTime> {
+internal class ZonedDateTimeConverter : TimeConverter<ZonedDateTime> {
 
     override fun supportedType() = ZonedDateTime::class.createType()
 

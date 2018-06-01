@@ -6,7 +6,7 @@ import kotlin.reflect.KTypeProjection
 import kotlin.reflect.full.createType
 import kotlin.reflect.jvm.jvmErasure
 
-class EnumConverter : TagConverter<Enum<*>?> {
+internal class EnumConverter : TagConverter<Enum<*>?> {
 
     override fun supportedType() = Enum::class.createType(arguments = listOf(KTypeProjection.STAR), nullable = true)
 

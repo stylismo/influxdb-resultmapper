@@ -7,17 +7,12 @@ import java.time.Instant
 
 class InfluxDaoTest : DbTest() {
 
-    private lateinit var registry: ConverterRegistry
-
-    private lateinit var introspector: ClassMappingIntrospector
-
     private lateinit var dao: InfluxDao<Foo>
 
     @Before
     fun setUpRegistry() {
-        registry = ConverterRegistry()
-        introspector = ClassMappingIntrospector(registry)
-        dao = InfluxDao(Foo::class, introspector, influxDB)
+        val registry = ConverterRegistry()
+        dao = InfluxDao(Foo::class, registry, influxDB)
     }
 
     @Test

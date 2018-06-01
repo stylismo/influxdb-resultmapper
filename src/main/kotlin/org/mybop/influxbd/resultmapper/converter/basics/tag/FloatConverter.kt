@@ -4,7 +4,7 @@ import org.mybop.influxbd.resultmapper.converter.TagConverter
 import kotlin.reflect.KType
 import kotlin.reflect.full.createType
 
-class FloatConverter : TagConverter<Float?> {
+internal class FloatConverter : TagConverter<Float?> {
 
     override fun supportedType() = Float::class.createType(nullable = true)
 

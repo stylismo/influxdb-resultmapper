@@ -4,7 +4,7 @@ import org.mybop.influxbd.resultmapper.converter.TagConverter
 import kotlin.reflect.KType
 import kotlin.reflect.full.createType
 
-class IntegerConverter : TagConverter<Int?> {
+internal class IntegerConverter : TagConverter<Int?> {
 
     override fun supportedType() = Int::class.createType(nullable = true)
 

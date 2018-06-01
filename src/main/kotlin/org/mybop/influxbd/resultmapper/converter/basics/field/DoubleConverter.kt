@@ -4,7 +4,7 @@ import org.mybop.influxbd.resultmapper.converter.NumberFieldConverter
 import kotlin.reflect.KType
 import kotlin.reflect.full.createType
 
-class DoubleConverter : NumberFieldConverter<Double?> {
+internal class DoubleConverter : NumberFieldConverter<Double?> {
 
     override fun supportedType() = Double::class.createType(nullable = true)
 

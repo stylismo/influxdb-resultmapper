@@ -1,31 +1,29 @@
-package org.mybop.influxbd.resultmapper
+package org.mybop.influxbd.resultmapper.mapping
 
-import org.mybop.influxbd.resultmapper.mapping.ClassReader
-import org.mybop.influxbd.resultmapper.mapping.ClassWriter
-import org.mybop.influxbd.resultmapper.mapping.FieldMapping
-import org.mybop.influxbd.resultmapper.mapping.TagMapping
-import org.mybop.influxbd.resultmapper.mapping.TimeMapping
+import org.mybop.influxbd.resultmapper.ConverterRegistry
+import org.mybop.influxbd.resultmapper.Field
+import org.mybop.influxbd.resultmapper.MappingException
+import org.mybop.influxbd.resultmapper.Tag
+import org.mybop.influxbd.resultmapper.Time
 import java.beans.BeanInfo
 import java.beans.Introspector
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
 
-class ClassMappingIntrospector(
-        private val registry: ConverterRegistry
-) {
+internal object ClassMappingIntrospector {
 
-    fun <K : Any> mapper(clazz: Class<K>) = mapper(clazz.kotlin)
+    fun <K : Any> mapper(clazz: Class<K>, registry: ConverterRegistry) = mapper(clazz.kotlin, registry)
 
-    fun <K : Any> mapper(clazz: KClass<K>): Pair<ClassReader<K>, ClassWriter<K>> {
+    fun <K : Any> mapper(clazz: KClass<K>, registry: ConverterRegistry): Pair<ClassReader<K>, ClassWriter<K>> {
 
         val beanInfo = Introspector.getBeanInfo(clazz.java)
 
-        val timeMapping = readTimeMapping(clazz, beanInfo)
+        val timeMapping = readTimeMapping(clazz, beanInfo, registry)
 
-        val fieldMapping = readFieldMapping(clazz, beanInfo)
+        val fieldMapping = readFieldMapping(clazz, beanInfo, registry)
 
-        val tagMapping = readTapMapping(clazz, beanInfo)
+        val tagMapping = readTapMapping(clazz, beanInfo, registry)
 
         return Pair(
                 ClassReader(
@@ -42,35 +40,35 @@ class ClassMappingIntrospector(
                 ))
     }
 
-    fun <K : Any> reader(clazz: Class<K>) = reader(clazz.kotlin)
+    fun <K : Any> reader(clazz: Class<K>, registry: ConverterRegistry) = reader(clazz.kotlin, registry)
 
-    fun <K : Any> reader(clazz: KClass<K>): ClassReader<K> {
+    fun <K : Any> reader(clazz: KClass<K>, registry: ConverterRegistry): ClassReader<K> {
 
         val beanInfo = Introspector.getBeanInfo(clazz.java)
 
         return ClassReader(
                 clazz,
-                readTimeMapping(clazz, beanInfo),
-                readFieldMapping(clazz, beanInfo),
-                readTapMapping(clazz, beanInfo)
+                readTimeMapping(clazz, beanInfo, registry),
+                readFieldMapping(clazz, beanInfo, registry),
+                readTapMapping(clazz, beanInfo, registry)
         )
     }
 
-    fun <K : Any> writer(clazz: Class<K>) = writer(clazz.kotlin)
+    fun <K : Any> writer(clazz: Class<K>, registry: ConverterRegistry) = writer(clazz.kotlin, registry)
 
-    fun <K : Any> writer(clazz: KClass<K>): ClassWriter<K> {
+    fun <K : Any> writer(clazz: KClass<K>, registry: ConverterRegistry): ClassWriter<K> {
 
         val beanInfo = Introspector.getBeanInfo(clazz.java)
 
         return ClassWriter(
                 clazz,
-                readTimeMapping(clazz, beanInfo),
-                readFieldMapping(clazz, beanInfo),
-                readTapMapping(clazz, beanInfo)
+                readTimeMapping(clazz, beanInfo, registry),
+                readFieldMapping(clazz, beanInfo, registry),
+                readTapMapping(clazz, beanInfo, registry)
         )
     }
 
-    internal fun <K : Any> readTimeMapping(clazz: KClass<K>, beanInfo: BeanInfo) =
+    private fun <K : Any> readTimeMapping(clazz: KClass<K>, beanInfo: BeanInfo, registry: ConverterRegistry) =
             clazz.memberProperties
                     .map {
                         Pair(it, it.findAnnotation<Time>())
@@ -83,7 +81,7 @@ class ClassMappingIntrospector(
                     }
                     ?: throw MappingException("No @Time property found in $clazz")
 
-    internal fun <K : Any> readFieldMapping(clazz: KClass<K>, beanInfo: BeanInfo) = clazz.memberProperties
+    private fun <K : Any> readFieldMapping(clazz: KClass<K>, beanInfo: BeanInfo, registry: ConverterRegistry) = clazz.memberProperties
             .map {
                 kotlin.Pair(it, it.findAnnotation<Field>())
             }
@@ -93,7 +91,7 @@ class ClassMappingIntrospector(
             }
             .toSet()
 
-    internal fun <K : Any> readTapMapping(clazz: KClass<K>, beanInfo: BeanInfo) =
+    private fun <K : Any> readTapMapping(clazz: KClass<K>, beanInfo: BeanInfo, registry: ConverterRegistry) =
             clazz.memberProperties
                     .map {
                         Pair(it, it.findAnnotation<Tag>())

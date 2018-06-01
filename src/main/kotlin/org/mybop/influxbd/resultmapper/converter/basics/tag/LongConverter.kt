@@ -4,7 +4,7 @@ import org.mybop.influxbd.resultmapper.converter.TagConverter
 import kotlin.reflect.KType
 import kotlin.reflect.full.createType
 
-class LongConverter : TagConverter<Long?> {
+internal class LongConverter : TagConverter<Long?> {
 
     override fun supportedType() = Long::class.createType(nullable = true)
 
