@@ -82,7 +82,7 @@ bintray {
 
     publications = ['mavenJava']
 
-    publish = false
+    publish = true
 
     pkg {
         repo = 'maven'
