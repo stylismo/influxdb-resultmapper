@@ -17,7 +17,7 @@ internal class TimeMapping<K : Any, T : Any?> constructor(
 
     private val annotation: Time = property.findAnnotation()!!
 
-    override val mappedName = "time"
+    override val mappedName = annotation.name
 
     override val propertyName: String
         get() = property.name

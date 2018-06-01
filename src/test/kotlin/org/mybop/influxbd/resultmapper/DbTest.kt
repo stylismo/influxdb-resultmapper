@@ -11,7 +11,7 @@ open class DbTest {
         private set
 
     protected val database = "testDb"
-    
+
     protected val retentionPolicy = "testRp"
 
     @Before
@@ -19,7 +19,7 @@ open class DbTest {
         influxDB = InfluxDBFactory.connect("http://localhost:8086", "user", "")
         influxDB.createDatabase(database)
         influxDB.createRetentionPolicy(retentionPolicy, database, "7d", "1d", 1)
-        println("InfluxDb v${influxDB.version()}")
+        println("InfluxDb ${influxDB.version()}")
     }
 
     @After

@@ -3,7 +3,7 @@ package org.mybop.influxbd.resultmapper;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
-@Measurement(name = "measurement_bar")
+@Measurement(database = "testDb", name = "measurement_bar")
 public class Bar {
 
     @Time
@@ -18,6 +18,7 @@ public class Bar {
     @Field(name = "count")
     private int number;
 
+    @Field
     private Color color;
 
     public Bar() {
@@ -73,7 +74,7 @@ public class Bar {
         }
         final Bar bar = (Bar) o;
         return number == bar.number &&
-                Objects.equals(createdAt, bar.createdAt) &&
+                createdAt.isEqual(bar.createdAt) &&
                 Objects.equals(zone, bar.zone) &&
                 category == bar.category &&
                 color == bar.color;

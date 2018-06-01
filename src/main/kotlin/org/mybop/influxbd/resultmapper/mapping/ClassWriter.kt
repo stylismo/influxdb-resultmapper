@@ -1,5 +1,7 @@
 package org.mybop.influxbd.resultmapper.mapping
 
+import org.influxdb.InfluxDB
+import org.influxdb.dto.BatchPoints
 import org.influxdb.dto.Point
 import org.mybop.influxbd.resultmapper.MappingException
 import org.mybop.influxbd.resultmapper.Measurement
@@ -44,4 +46,15 @@ class ClassWriter<K : Any> internal constructor(
             .fields(fieldMappings.associate { Pair(it.mappedName, it.extractField(value)) })
             .tag(tagMappings.associate { Pair(it.mappedName, it.extractField(value)) })
             .build()
+
+    fun toBatchPoints(elements: Collection<K>, consistencyLevel: InfluxDB.ConsistencyLevel): BatchPoints {
+        val builder = BatchPoints.database(database)
+                .retentionPolicy(retentionPolicy)
+                .consistency(consistencyLevel)
+
+        elements.map(this::toPoint)
+                .forEach { builder.point(it) }
+
+        return builder.build()
+    }
 }

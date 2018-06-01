@@ -3,6 +3,7 @@ package org.mybop.influxbd.resultmapper.mapping
 import org.assertj.core.api.Assertions.assertThat
 import org.influxdb.dto.BoundParameterQuery
 import org.junit.Test
+import org.mybop.influxbd.resultmapper.ClassMappingIntrospector
 import org.mybop.influxbd.resultmapper.ConverterRegistry
 import org.mybop.influxbd.resultmapper.DbTest
 import org.mybop.influxbd.resultmapper.Foo
@@ -15,9 +16,7 @@ class ClassMappingTest : DbTest() {
 
     @Test
     fun mapping() {
-        val registry = ConverterRegistry()
-        val mapping = ClassMapping.read(Foo::class, registry)
-        System.out.print(mapping)
+        val (reader, writer) = ClassMappingIntrospector(ConverterRegistry()).mapper(Foo::class)
 
         val foo = Foo(
                 Instant.now(),
@@ -26,18 +25,18 @@ class ClassMappingTest : DbTest() {
                 "value"
         )
 
-        val point = mapping.writer.toPoint(foo)
+        val point = writer.toPoint(foo)
 
         influxDB.write(database, retentionPolicy, point)
 
         val result = influxDB.query(
                 BoundParameterQuery.QueryBuilder
-                        .newQuery("SELECT * FROM \"$retentionPolicy\".\"${mapping.writer.measurementName}\"")
+                        .newQuery("SELECT * FROM \"$retentionPolicy\".\"${writer.measurementName}\"")
                         .forDatabase(database)
                         .create()
         )
 
-        val parsed = mapping.reader.parseQueryResult(result)
+        val parsed = reader.parseQueryResult(result)
         assertThat(parsed.size).isEqualTo(1)
         assertThat(parsed[0].size).isEqualTo(1)
 
@@ -47,7 +46,5 @@ class ClassMappingTest : DbTest() {
 
         val value = entry.value[0]
         assertThat(value).isEqualTo(foo)
-
-        System.out.println("$parsed")
     }
 }

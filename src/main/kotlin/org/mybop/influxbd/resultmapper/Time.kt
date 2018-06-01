@@ -6,5 +6,6 @@ import kotlin.reflect.KClass
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
 annotation class Time(
+        val name: String = "time",
         val converter: KClass<out TimeConverter<*>> = TimeConverter::class
 )

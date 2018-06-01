@@ -2,7 +2,7 @@ package org.mybop.influxbd.resultmapper
 
 import java.time.Instant
 
-@Measurement
+@Measurement(database = "testDb", retentionPolicy = "testRp")
 data class Foo(
         @Time
         val time: Instant,

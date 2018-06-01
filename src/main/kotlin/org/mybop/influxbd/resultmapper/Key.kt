@@ -4,6 +4,7 @@ data class Key(
         private val value: Map<String, Any?> = mapOf()
 ) {
     companion object {
+        @JvmStatic
         val EMPTY = Key(emptyMap())
     }
 }
