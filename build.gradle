@@ -15,7 +15,7 @@ buildscript {
 }
 
 group 'org.mybop'
-version '1.0-UNSTABLE5'
+version '1.0-UNSTABLE6'
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
