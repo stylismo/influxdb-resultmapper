@@ -71,7 +71,7 @@ internal class ClassReader<K : Any> internal constructor(
                 .plus(columns.map {
                     when {
                         isField(it.key) -> readField<Any?, Any?>(it.key, it.value)
-                        isTag(it.key) -> readTag(it.key, it.value as String)
+                        isTag(it.key) -> readTag(it.key, it.value as String?)
                         else -> throw MappingException("Unknown column ${it.key}")
                     }
                 })
