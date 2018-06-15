@@ -11,7 +11,7 @@ import kotlin.reflect.full.findAnnotation
 internal class ClassWriter<K : Any> internal constructor(
         private val clazz: KClass<K>,
         private val timeMapping: TimeMapping<K, *>,
-        private val fieldMappings: Set<FieldMapping<K, *, *>>,
+        private val fieldMappings: Set<FieldMapping<K, *, *, *>>,
         private val tagMappings: Set<TagMapping<K, *>>
 ) {
     private val measurement: Measurement = clazz.findAnnotation()

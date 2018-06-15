@@ -9,11 +9,11 @@ import java.lang.reflect.Method
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.findAnnotation
 
-internal class FieldMapping<K : Any, T : Any?, R : Any?> constructor(
+internal class FieldMapping<K : Any, T : Any?, D : Any?, R : Any?> constructor(
         private val property: KProperty1<K, T>,
         propertyDescriptor: PropertyDescriptor,
         registry: ConverterRegistry
-) : PropertyMapping<K, T, R, R> {
+) : PropertyMapping<K, T, D, R, R> {
 
     private val annotation: Field = property.findAnnotation()!!
 
@@ -33,7 +33,7 @@ internal class FieldMapping<K : Any, T : Any?, R : Any?> constructor(
 
     private val setter: Method? = propertyDescriptor.writeMethod
 
-    private val converter: FieldConverter<T, R> =
+    private val converter: FieldConverter<T, D, R> =
             if (annotation.converter == FieldConverter::class) {
                 registry.findFieldConverterFor(property.returnType)
             } else {
@@ -41,7 +41,7 @@ internal class FieldMapping<K : Any, T : Any?, R : Any?> constructor(
             }
 
     @Suppress("UNCHECKED_CAST")
-    override fun extractField(value: K) = getter.invoke(value)?.let { converter.convert(it as T) }
+    override fun extractField(value: K): D? = getter.invoke(value)?.let { converter.convert(it as T) }
 
     override fun parseResult(res: R) = converter.reverse(res, property.returnType)
 

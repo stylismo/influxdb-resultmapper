@@ -1,12 +1,12 @@
 package org.mybop.influxbd.resultmapper.mapping
 
-internal interface PropertyMapping<K : Any, T : Any?, R : Any?, S : Any?> {
+internal interface PropertyMapping<K : Any, T : Any?, D : Any?, R : Any?, S : Any?> {
 
     val mappedName: String
 
     val propertyName: String
 
-    fun extractField(value: K): R?
+    fun extractField(value: K): D?
 
     fun parseResult(res: S): T
 

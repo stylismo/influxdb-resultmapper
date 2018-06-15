@@ -21,7 +21,8 @@ class InfluxDaoTest : DbTest() {
                 Instant.now(),
                 "tag1",
                 Strategy.SIMPLE,
-                "value"
+                "value",
+                45
         )
 
         dao.save(bar)

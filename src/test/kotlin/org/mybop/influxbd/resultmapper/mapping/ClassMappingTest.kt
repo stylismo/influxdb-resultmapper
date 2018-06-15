@@ -21,7 +21,8 @@ class ClassMappingTest : DbTest() {
                 Instant.now(),
                 "key",
                 Strategy.COMPLETE,
-                "value"
+                "value",
+                32
         )
 
         val point = writer.toPoint(foo)
