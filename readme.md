@@ -4,6 +4,8 @@
 
 [![Build Status](https://travis-ci.org/GautierLevert/influxdb-resultmapper.svg?branch=develop)](https://travis-ci.org/GautierLevert/influxdb-resultmapper)
 
+[![Download](https://api.bintray.com/packages/gautierlevert/maven/influxdb-resultmapper/images/download.svg)](https://bintray.com/gautierlevert/maven/influxdb-resultmapper/_latestVersion)
+
 # What is it ?
 
 This library goal is to provide basic dao features for Java projects using InfluxDB.
