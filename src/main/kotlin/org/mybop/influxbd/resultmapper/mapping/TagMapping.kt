@@ -13,7 +13,7 @@ internal class TagMapping<K : Any, T : Any?> constructor(
         private val property: KProperty1<K, T>,
         propertyDescriptor: PropertyDescriptor,
         registry: ConverterRegistry
-) : PropertyMapping<K, T, String?, String?> {
+) : PropertyMapping<K, T, String?, String?, String?> {
 
     private val annotation: Tag = property.findAnnotation()!!
 
@@ -44,14 +44,7 @@ internal class TagMapping<K : Any, T : Any?> constructor(
     override fun extractField(value: K) = getter.invoke(value)?.let { converter.convert(it as T) }
 
     override fun parseResult(res: String?) =
-            converter.reverse(
-                    if (res?.isEmpty() != false) {
-                        null
-                    } else {
-                        res
-                    },
-                    property.returnType
-            )
+            converter.reverse(res, property.returnType)
 
     override fun writeField(obj: K, value: T) {
         if (setter == null) {

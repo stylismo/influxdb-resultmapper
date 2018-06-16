@@ -10,5 +10,5 @@ import kotlin.reflect.KClass
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
 annotation class Field(
         val name: String = "",
-        val converter: KClass<out FieldConverter<*, *>> = FieldConverter::class
+        val converter: KClass<out FieldConverter<*, *, *>> = FieldConverter::class
 )

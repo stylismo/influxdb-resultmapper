@@ -87,7 +87,7 @@ internal object ClassMappingIntrospector {
             }
             .filter { (_, field) -> field != null }
             .map { (property, _) ->
-                FieldMapping<K, Any?, Any?>(property, beanInfo.propertyDescriptors.find { it.name == property.name }!!, registry)
+                FieldMapping<K, Any?, Any?, Any?>(property, beanInfo.propertyDescriptors.find { it.name == property.name }!!, registry)
             }
             .toSet()
 

@@ -13,7 +13,7 @@ internal class TimeMapping<K : Any, T : Any?> constructor(
         private val property: KProperty1<K, T>,
         propertyDescriptor: PropertyDescriptor,
         registry: ConverterRegistry
-) : PropertyMapping<K, T, Long, String> {
+) : PropertyMapping<K, T, Long, Long, String> {
 
     private val annotation: Time = property.findAnnotation()!!
 

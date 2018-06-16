@@ -11,5 +11,7 @@ data class Foo(
         @Tag
         val strategy: Strategy,
         @Field
-        val bar: String
+        val bar: String,
+        @Field
+        val number: Int
 )

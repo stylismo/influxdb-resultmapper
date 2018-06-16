@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.2.41'
+    ext.kotlin_version = '1.2.50'
     ext.influxdb_client_version = '2.10'
 
     repositories {
@@ -15,7 +15,7 @@ buildscript {
 }
 
 group 'org.mybop'
-version '1.0-UNSTABLE6'
+version '1.0-UNSTABLE7'
 
 apply plugin: 'java'
 apply plugin: 'kotlin'

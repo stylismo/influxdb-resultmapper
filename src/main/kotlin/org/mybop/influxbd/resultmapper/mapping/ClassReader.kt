@@ -8,7 +8,7 @@ import kotlin.reflect.KClass
 internal class ClassReader<K : Any> internal constructor(
         private val clazz: KClass<K>,
         private val timeMapping: TimeMapping<K, *>,
-        private val fieldMappings: Set<FieldMapping<K, *, *>>,
+        private val fieldMappings: Set<FieldMapping<K, *, *, *>>,
         private val tagMappings: Set<TagMapping<K, *>>
 ) {
 
@@ -45,6 +45,8 @@ internal class ClassReader<K : Any> internal constructor(
 
         return Key(
                 series.tags.entries
+                        .filter { it.value != null }
+                        .filter { it.value.isNotEmpty() }
                         .associate { Pair(it.key, findTagMapper(it.key).parseResult(it.value)) }
         )
     }
@@ -61,8 +63,7 @@ internal class ClassReader<K : Any> internal constructor(
         }
 
         return series.values.map { values ->
-            parseModel(values[0] as String, series.columns.drop(1).zip(values.drop(1)).associate { it }
-                    .plus(series.tags ?: emptyMap()))
+            parseModel(values[0] as String, series.columns.drop(1).zip(values.drop(1)).associate { it })
         }
     }
 
@@ -110,7 +111,7 @@ internal class ClassReader<K : Any> internal constructor(
 
     private fun <R : Any?, S : Any?> readField(name: String, value: R): Pair<String, S> {
         @Suppress("UNCHECKED_CAST")
-        val mapping = fieldMappings.first { it.mappedName == name } as FieldMapping<K, S, R>
+        val mapping = fieldMappings.first { it.mappedName == name } as FieldMapping<K, S, *, R>
 
         return Pair(mapping.propertyName, mapping.parseResult(value))
     }
@@ -127,7 +128,7 @@ internal class ClassReader<K : Any> internal constructor(
     private fun <R : Any?> writeProperty(propertyName: String, obj: K, value: R) {
         @Suppress("UNCHECKED_CAST")
         val mapping = fieldMappings.plus(tagMappings).plus(timeMapping)
-                .find { it.propertyName == propertyName } as? PropertyMapping<K, R, *, *>
+                .find { it.propertyName == propertyName } as? PropertyMapping<K, R, *, *, *>
                 ?: throw MappingException("Mapping not found for property $propertyName")
 
         mapping.writeField(obj, value)

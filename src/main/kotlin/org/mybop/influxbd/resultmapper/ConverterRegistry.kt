@@ -22,7 +22,7 @@ class ConverterRegistry {
 
     private val tagConverters = mutableSetOf<TagConverter<out Any?>>()
 
-    private val fieldConverters = mutableSetOf<FieldConverter<out Any?, out Any?>>()
+    private val fieldConverters = mutableSetOf<FieldConverter<out Any?, out Any?, out Any?>>()
 
     init {
         timeConverters.add(InstantConverter())
@@ -82,21 +82,21 @@ class ConverterRegistry {
             } as TagConverter<T>?
                     ?: throw MappingException("No tag converter with class $converter found.")
 
-    fun registerFieldConverter(fieldConverter: FieldConverter<*, *>) {
+    fun registerFieldConverter(fieldConverter: FieldConverter<*, *, *>) {
         fieldConverters.add(fieldConverter)
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <T : Any?, R : Any?> findFieldConverterFor(type: KType): FieldConverter<T, R> =
+    fun <T : Any?, D : Any?, R : Any?> findFieldConverterFor(type: KType): FieldConverter<T, D, R> =
             fieldConverters.find {
                 it.supportedType().isSupertypeOf(type)
-            } as FieldConverter<T, R>?
+            } as FieldConverter<T, D, R>?
                     ?: throw MappingException("No field converter found for type $type.")
 
     @Suppress("UNCHECKED_CAST")
-    fun <T : Any?, R : Any?> findFieldConverter(converter: KClass<out FieldConverter<*, *>>): FieldConverter<T, R> =
+    fun <T : Any?, D : Any?, R : Any?> findFieldConverter(converter: KClass<out FieldConverter<*, *, *>>): FieldConverter<T, D, R> =
             fieldConverters.find {
                 it::class == converter
-            } as FieldConverter<T, R>?
+            } as FieldConverter<T, D, R>?
                     ?: throw MappingException("No field converter with class $converter found.")
 }
