@@ -60,7 +60,7 @@ tasks.withType(JavaCompile) {
 }
 
 dokka {
-    moduleName = 'ormlite-rx'
+    moduleName = 'influxdb-resultmapper'
     outputFormat = 'html'
 
     jdkVersion = 8
