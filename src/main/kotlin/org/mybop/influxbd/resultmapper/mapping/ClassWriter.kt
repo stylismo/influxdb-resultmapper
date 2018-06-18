@@ -43,8 +43,8 @@ internal class ClassWriter<K : Any> internal constructor(
 
     fun toPoint(value: K): Point = Point.measurement(measurementName)
             .time(timeMapping.extractField(value), timeMapping.precision())
-            .fields(fieldMappings.associate { Pair(it.mappedName, it.extractField(value)) })
-            .tag(tagMappings.associate { Pair(it.mappedName, it.extractField(value)) })
+            .fields(fieldMappings.associate { Pair(it.mappedName, it.extractField(value)) }.filter { it.value != null })
+            .tag(tagMappings.associate { Pair(it.mappedName, it.extractField(value)) }.filter { it.value != null })
             .build()
 
     fun toBatchPoints(elements: Collection<K>, consistencyLevel: InfluxDB.ConsistencyLevel): BatchPoints {

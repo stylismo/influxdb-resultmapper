@@ -1,5 +1,6 @@
 package org.mybop.influxbd.resultmapper;
 
+import javax.annotation.Nullable;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
@@ -21,7 +22,12 @@ public class Bar {
     @Field
     private Color color;
 
-    public Bar() {
+    @Tag
+    @Nullable
+    private String optional;
+
+    public Bar(@Nullable final String optional) {
+        this.optional = optional;
     }
 
     public ZonedDateTime getCreatedAt() {
@@ -62,6 +68,15 @@ public class Bar {
 
     public void setColor(final Color color) {
         this.color = color;
+    }
+
+    @Nullable
+    public String getOptional() {
+        return optional;
+    }
+
+    public void setOptional(final @Nullable String optional) {
+        this.optional = optional;
     }
 
     @Override

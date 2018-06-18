@@ -21,6 +21,7 @@ class InfluxDaoTest : DbTest() {
                 Instant.now(),
                 "tag1",
                 Strategy.SIMPLE,
+                null,
                 "value",
                 45
         )

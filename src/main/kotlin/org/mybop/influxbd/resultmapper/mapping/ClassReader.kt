@@ -99,7 +99,7 @@ internal class ClassReader<K : Any> internal constructor(
 
     private fun findConstructor(attributes: Collection<String>) = clazz.constructors
             .sortedByDescending { it.parameters.size }
-            .find { attributes.containsAll(it.parameters.map { it.name }) }
+            .find { it.parameters.all { attributes.contains(it.name) || it.type.isMarkedNullable } }
             ?: throw MappingException("No constructor available for class ${clazz.qualifiedName}")
 
     private fun <R : Any?> readTime(value: String): Pair<String, R> {

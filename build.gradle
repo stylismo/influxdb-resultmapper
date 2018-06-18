@@ -15,7 +15,7 @@ buildscript {
 }
 
 group 'org.mybop'
-version '1.0-UNSTABLE7'
+version '1.0-UNSTABLE8'
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
@@ -34,6 +34,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation "org.influxdb:influxdb-java:$influxdb_client_version"
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.18.3'

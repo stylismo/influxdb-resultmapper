@@ -20,7 +20,7 @@ public class JavaInfluxDaoTest extends DbTest {
 
     @Test
     public void simple() {
-        final Bar bar = new Bar();
+        final Bar bar = new Bar("val");
         bar.setCreatedAt(ZonedDateTime.now());
         bar.setColor(Color.RED);
         bar.setCategory(Category.B);

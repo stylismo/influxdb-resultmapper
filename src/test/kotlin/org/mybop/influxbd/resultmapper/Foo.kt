@@ -10,6 +10,8 @@ data class Foo(
         val key: String,
         @Tag
         val strategy: Strategy,
+        @Tag
+        val optional: String?,
         @Field
         val bar: String,
         @Field

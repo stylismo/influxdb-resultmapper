@@ -26,7 +26,7 @@ public class JavaMappingTest extends DbTest {
         final ClassReader<Bar> reader = introspector.reader(Bar.class, registry);
         final ClassWriter<Bar> writer = introspector.writer(Bar.class, registry);
 
-        final Bar bar = new Bar();
+        final Bar bar = new Bar(null);
         bar.setCreatedAt(ZonedDateTime.now());
         bar.setCategory(Category.B);
         bar.setNumber(12);

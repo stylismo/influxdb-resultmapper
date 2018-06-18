@@ -21,6 +21,7 @@ class ClassMappingTest : DbTest() {
                 Instant.now(),
                 "key",
                 Strategy.COMPLETE,
+                "opt",
                 "value",
                 32
         )
