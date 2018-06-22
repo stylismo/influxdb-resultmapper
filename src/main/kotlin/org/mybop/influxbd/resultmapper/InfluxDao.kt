@@ -6,6 +6,8 @@ import org.mybop.influxbd.resultmapper.mapping.ClassMappingIntrospector
 import org.mybop.influxbd.resultmapper.mapping.ClassReader
 import org.mybop.influxbd.resultmapper.mapping.ClassWriter
 import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.full.createType
 
 class InfluxDao<K : Any>(
         clazz: KClass<K>,
@@ -75,4 +77,40 @@ class InfluxDao<K : Any>(
             )
 
     fun <T : Any> query(query: String, clazz: Class<T>) = query(query, clazz.kotlin)
+
+    fun <T : Any> querySingleValue(query: String, clazz: Class<T>) = querySingleValue(query, clazz.kotlin)
+
+    fun <T : Any> querySingleValue(query: String, clazz: KClass<T>): T? = querySingleValue(query, clazz.createType())
+
+    fun <T : Any> querySingleValue(query: String, type: KType): T? {
+        val queryResult = client.query(Query(query, database))
+
+        if (queryResult.hasError()) {
+            throw MappingException(queryResult.error)
+        }
+
+        if (queryResult.results?.isEmpty() != false) {
+            return null
+        }
+
+        if (queryResult.results[0].hasError()) {
+            throw MappingException(queryResult.results[0].error)
+        }
+
+        if (queryResult.results[0].series?.isEmpty() != false) {
+            return null
+        }
+
+        if (queryResult.results[0].series[0].values?.isEmpty() != false) {
+            return null
+        }
+
+        if (queryResult.results[0].series[0].values[0]?.size ?: 0 < 2) {
+            return null
+        }
+
+        val converter = registry.findFieldConverterFor<T, Any?, Any?>(type)
+
+        return converter.reverse(queryResult.results[0].series[0].values[0][1], type)
+    }
 }

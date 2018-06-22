@@ -53,4 +53,26 @@ class InfluxDaoTest : DbTest() {
 
         assertThat(values.size).isEqualTo(0)
     }
+
+    @Test
+    fun count() {
+        val count1 = dao.querySingleValue("SELECT COUNT(\"number\") FROM \"${dao.retentionPolicy}\".\"${dao.measurementName}\"", Long::class)
+
+        assertThat(count1).isNull()
+
+        val bar = Foo(
+                Instant.now(),
+                "tag1",
+                Strategy.SIMPLE,
+                null,
+                "value",
+                45
+        )
+
+        dao.save(bar)
+
+        val count2 = dao.querySingleValue("SELECT COUNT(\"number\") FROM \"${dao.retentionPolicy}\".\"${dao.measurementName}\"", Long::class)
+
+        assertThat(count2).isEqualTo(1)
+    }
 }
