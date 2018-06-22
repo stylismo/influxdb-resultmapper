@@ -42,6 +42,10 @@ class InfluxDao<K : Any>(
         client.write(writer.toBatchPoints(elements, consistencyLevel))
     }
 
+    fun execute(query: String) {
+        query(query)
+    }
+
     fun queryOne(query: String) = queryList(query).firstOrNull()
 
     fun <T : Any> queryOne(query: String, clazz: KClass<T>) = queryList(query, clazz).firstOrNull()

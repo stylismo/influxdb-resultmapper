@@ -33,4 +33,24 @@ class InfluxDaoTest : DbTest() {
         assertThat(values.size).isEqualTo(1)
         assertThat(values[0]).isEqualTo(bar)
     }
+
+    @Test
+    fun delete() {
+        val bar = Foo(
+                Instant.now(),
+                "tag1",
+                Strategy.SIMPLE,
+                null,
+                "value",
+                45
+        )
+
+        dao.save(bar)
+
+        dao.execute("DELETE FROM \"${dao.measurementName}\"")
+
+        val values = dao.queryList("SELECT * FROM \"${dao.retentionPolicy}\".\"${dao.measurementName}\"")
+
+        assertThat(values.size).isEqualTo(0)
+    }
 }
