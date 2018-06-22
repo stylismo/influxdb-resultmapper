@@ -35,7 +35,10 @@ internal class ClassReader<K : Any> internal constructor(
         }
 
         return result.series
-                .associate { Pair(parseKey(it), parseSeries(it)) }
+                .associate {
+                    val key = parseKey(it)
+                    Pair(key, parseSeries(key, it))
+                }
     }
 
     private fun parseKey(series: QueryResult.Series): Key {
@@ -57,17 +60,17 @@ internal class ClassReader<K : Any> internal constructor(
         } ?: throw MappingException("No tag mapping for key $name")
     }
 
-    private fun parseSeries(series: QueryResult.Series): List<K> {
+    private fun parseSeries(key: Key, series: QueryResult.Series): List<K> {
         if (series.values?.isEmpty() != false) {
             return emptyList()
         }
 
         return series.values.map { values ->
-            parseModel(values[0] as String, series.columns.drop(1).zip(values.drop(1)).associate { it })
+            parseModel(values[0] as String, key, series.columns.drop(1).zip(values.drop(1)).associate { it })
         }
     }
 
-    private fun parseModel(time: String, columns: Map<String, Any>): K {
+    private fun parseModel(time: String, key: Key, columns: Map<String, Any>): K {
         val properties = listOf<Pair<String, Any?>>(readTime(time))
                 .plus(columns.map {
                     when {
@@ -77,6 +80,7 @@ internal class ClassReader<K : Any> internal constructor(
                     }
                 })
                 .associate { it }
+                .plus(key.value)
 
         val constructor = findConstructor(properties.keys)
 
