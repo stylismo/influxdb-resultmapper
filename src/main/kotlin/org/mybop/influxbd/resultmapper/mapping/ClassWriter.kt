@@ -12,7 +12,8 @@ internal class ClassWriter<K : Any> internal constructor(
         private val clazz: KClass<K>,
         private val timeMapping: TimeMapping<K, *>,
         private val fieldMappings: Set<FieldMapping<K, *, *, *>>,
-        private val tagMappings: Set<TagMapping<K, *>>
+        private val tagMappings: Set<TagMapping<K, *>>,
+        private val otherFieldsMapping: FieldsMapping<K>?
 ) {
     private val measurement: Measurement = clazz.findAnnotation()
             ?: throw MappingException("Class ${clazz.qualifiedName} must be annotated with @Measurement")
@@ -43,7 +44,9 @@ internal class ClassWriter<K : Any> internal constructor(
 
     fun toPoint(value: K): Point = Point.measurement(measurementName)
             .time(timeMapping.extractField(value), timeMapping.precision())
-            .fields(fieldMappings.associate { Pair(it.mappedName, it.extractField(value)) }.filter { it.value != null })
+            .fields(fieldMappings.associate { Pair(it.mappedName, it.extractField(value)) }
+                    .plus(otherFieldsMapping?.extractValues(value) ?: emptyMap())
+                    .filter { it.value != null })
             .tag(tagMappings.associate { Pair(it.mappedName, it.extractField(value)) }.filter { it.value != null })
             .build()
 

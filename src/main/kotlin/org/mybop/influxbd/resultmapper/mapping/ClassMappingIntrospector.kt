@@ -2,12 +2,14 @@ package org.mybop.influxbd.resultmapper.mapping
 
 import org.mybop.influxbd.resultmapper.ConverterRegistry
 import org.mybop.influxbd.resultmapper.Field
+import org.mybop.influxbd.resultmapper.Fields
 import org.mybop.influxbd.resultmapper.MappingException
 import org.mybop.influxbd.resultmapper.Tag
 import org.mybop.influxbd.resultmapper.Time
 import java.beans.BeanInfo
 import java.beans.Introspector
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty1
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
 
@@ -25,18 +27,22 @@ internal object ClassMappingIntrospector {
 
         val tagMapping = readTapMapping(clazz, beanInfo, registry)
 
+        val fieldsMapping = readFieldsMapping(clazz, beanInfo)
+
         return Pair(
                 ClassReader(
                         clazz,
                         timeMapping,
                         fieldMapping,
-                        tagMapping
+                        tagMapping,
+                        fieldsMapping
                 ),
                 ClassWriter(
                         clazz,
                         timeMapping,
                         fieldMapping,
-                        tagMapping
+                        tagMapping,
+                        fieldsMapping
                 ))
     }
 
@@ -50,7 +56,8 @@ internal object ClassMappingIntrospector {
                 clazz,
                 readTimeMapping(clazz, beanInfo, registry),
                 readFieldMapping(clazz, beanInfo, registry),
-                readTapMapping(clazz, beanInfo, registry)
+                readTapMapping(clazz, beanInfo, registry),
+                readFieldsMapping(clazz, beanInfo)
         )
     }
 
@@ -64,7 +71,8 @@ internal object ClassMappingIntrospector {
                 clazz,
                 readTimeMapping(clazz, beanInfo, registry),
                 readFieldMapping(clazz, beanInfo, registry),
-                readTapMapping(clazz, beanInfo, registry)
+                readTapMapping(clazz, beanInfo, registry),
+                readFieldsMapping(clazz, beanInfo)
         )
     }
 
@@ -106,4 +114,19 @@ internal object ClassMappingIntrospector {
                         )
                     }
                     .toSet()
+
+    private fun <K : Any> readFieldsMapping(clazz: KClass<K>, beanInfo: BeanInfo) =
+            clazz.memberProperties
+                    .map {
+                        Pair(it, it.findAnnotation<Fields>())
+                    }
+                    .filter { (_, tag) -> tag != null }
+                    .map { (property, _) ->
+                        FieldsMapping(
+                                property as KProperty1<K, Map<String, Any>>,
+                                beanInfo.propertyDescriptors.find { it.name == property.name }
+                                        ?: throw MappingException("Unable to find property description of field `${property.name}` for type `${clazz.qualifiedName}`")
+                        )
+                    }
+                    .firstOrNull()
 }

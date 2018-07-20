@@ -9,7 +9,8 @@ internal class ClassReader<K : Any> internal constructor(
         private val clazz: KClass<K>,
         private val timeMapping: TimeMapping<K, *>,
         private val fieldMappings: Set<FieldMapping<K, *, *, *>>,
-        private val tagMappings: Set<TagMapping<K, *>>
+        private val tagMappings: Set<TagMapping<K, *>>,
+        private val otherFieldsMapping: FieldsMapping<K>?
 ) {
 
     fun parseQueryResult(queryResult: QueryResult): List<Map<Key, List<K>>> {
@@ -72,15 +73,19 @@ internal class ClassReader<K : Any> internal constructor(
 
     private fun parseModel(time: String, key: Key, columns: Map<String, Any>): K {
         val properties = listOf<Pair<String, Any?>>(readTime(time))
-                .plus(columns.map {
-                    when {
-                        isField(it.key) -> readField<Any?, Any?>(it.key, it.value)
-                        isTag(it.key) -> readTag(it.key, it.value as String?)
-                        else -> throw MappingException("Unknown column ${it.key}")
-                    }
-                })
+                .plus(columns.filter { isField(it.key) }
+                        .map { readField<Any?, Any?>(it.key, it.value) })
+                .plus(columns.filter { isTag(it.key) }
+                        .map { readTag<Any?>(it.key, it.value as String?) })
                 .associate { it }
                 .plus(key.value)
+                .plus(
+                        otherFieldsMapping?.let {
+                            mapOf(Pair(it.propertyName, columns
+                                    .filter { !isField(it.key) && !isTag(it.key) })
+                            )
+                        } ?: emptyMap()
+                )
 
         val constructor = findConstructor(properties.keys)
 
