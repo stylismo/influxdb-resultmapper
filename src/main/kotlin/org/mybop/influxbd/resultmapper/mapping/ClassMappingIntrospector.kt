@@ -122,6 +122,7 @@ internal object ClassMappingIntrospector {
                     }
                     .filter { (_, tag) -> tag != null }
                     .map { (property, _) ->
+                        @Suppress("UNCHECKED_CAST")
                         FieldsMapping(
                                 property as KProperty1<K, Map<String, Any>>,
                                 beanInfo.propertyDescriptors.find { it.name == property.name }
