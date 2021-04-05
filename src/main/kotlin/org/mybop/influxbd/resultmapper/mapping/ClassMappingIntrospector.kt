@@ -15,9 +15,9 @@ import kotlin.reflect.full.memberProperties
 
 internal object ClassMappingIntrospector {
 
-    fun <K : Any> mapper(clazz: Class<K>, registry: ConverterRegistry) = mapper(clazz.kotlin, registry)
+    fun <K : Any> mapper(clazz: Class<K>, registry: ConverterRegistry, db: String? = null) = mapper(clazz.kotlin, registry, db)
 
-    fun <K : Any> mapper(clazz: KClass<K>, registry: ConverterRegistry): Pair<ClassReader<K>, ClassWriter<K>> {
+    fun <K : Any> mapper(clazz: KClass<K>, registry: ConverterRegistry, db: String? = null): Pair<ClassReader<K>, ClassWriter<K>> {
 
         val beanInfo = Introspector.getBeanInfo(clazz.java)
 
@@ -42,7 +42,8 @@ internal object ClassMappingIntrospector {
                         timeMapping,
                         fieldMapping,
                         tagMapping,
-                        fieldsMapping
+                        fieldsMapping,
+                        db
                 ))
     }
 

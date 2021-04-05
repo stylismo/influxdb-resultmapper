@@ -12,7 +12,8 @@ import kotlin.reflect.full.createType
 class InfluxDao<K : Any>(
         clazz: KClass<K>,
         private val registry: ConverterRegistry,
-        private val client: InfluxDB
+        private val client: InfluxDB,
+        private val db: String? = null
 ) {
 
     constructor(clazz: Class<K>, registry: ConverterRegistry, client: InfluxDB) : this(clazz.kotlin, registry, client)
@@ -24,7 +25,7 @@ class InfluxDao<K : Any>(
     private val writer: ClassWriter<K>
 
     val database
-        get() = writer.database
+        get() = writer.database ?: db
 
     val retentionPolicy
         get() = writer.retentionPolicy
@@ -33,7 +34,7 @@ class InfluxDao<K : Any>(
         get() = writer.measurementName
 
     init {
-        val (reader, writer) = ClassMappingIntrospector.mapper(clazz, registry)
+        val (reader, writer) = ClassMappingIntrospector.mapper(clazz, registry, db)
         this.reader = reader
         this.writer = writer
     }

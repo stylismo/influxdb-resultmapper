@@ -13,7 +13,8 @@ internal class ClassWriter<K : Any> internal constructor(
         private val timeMapping: TimeMapping<K, *>,
         private val fieldMappings: Set<FieldMapping<K, *, *, *>>,
         private val tagMappings: Set<TagMapping<K, *>>,
-        private val otherFieldsMapping: FieldsMapping<K>?
+        private val otherFieldsMapping: FieldsMapping<K>?,
+        private val db: String? = null
 ) {
     private val measurement: Measurement = clazz.findAnnotation()
             ?: throw MappingException("Class ${clazz.qualifiedName} must be annotated with @Measurement")
@@ -37,7 +38,7 @@ internal class ClassWriter<K : Any> internal constructor(
     val database: String?
         get() =
             if (measurement.database.isBlank()) {
-                null
+                db
             } else {
                 measurement.database
             }
