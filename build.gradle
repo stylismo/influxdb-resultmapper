@@ -1,6 +1,6 @@
 buildscript {
     ext.kotlin_version = '1.2.61'
-    ext.influxdb_client_version = '2.12'
+    ext.influxdb_client_version = '2.17'
 
     repositories {
         jcenter()
